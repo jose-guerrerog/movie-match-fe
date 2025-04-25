@@ -6,7 +6,7 @@ interface RecommendationCardProps {
   onClick?: (recommendation: Recommendation) => void;
 }
 
-const RecommendationCard: React.FC<RecommendationCardProps> = ({ 
+export const RecommendationCard: React.FC<RecommendationCardProps> = ({ 
   recommendation, 
   onClick 
 }) => {
@@ -88,5 +88,3 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
     </div>
   );
 };
-
-export default RecommendationCard;

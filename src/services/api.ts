@@ -36,80 +36,73 @@ export interface StatsResponse {
   uniqueGenres: number;
 }
 
+export const fetchMovies = async (page = 1, limit = 20, search = '') => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+  
+  if (search) {
+    params.append('search', search);
+  }
+  
+  const response = await fetch(`${API_BASE_URL}/movies?${params}`);
+  
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
+  
+  return await response.json();
+};
+
+export const fetchRecommendations = async (
+  movieId: number,
+  method: 'content' | 'collaborative' | 'hybrid' = 'hybrid',
+  count = 5
+) => {
+  const params = new URLSearchParams({
+    movie_id: movieId.toString(),
+    count: count.toString(),
+    method,
+  });
+  
+  const response = await fetch(`${API_BASE_URL}/recommend?${params}`);
+  
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
+  
+  return await response.json();
+};
+
+export const fetchStats = async() => {
+  const response = await fetch(`${API_BASE_URL}/stats`);
+  
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
+  
+  return await response.json();
+};
+
+export const prepareData = async (message: string) => {
+  const response = await fetch(`${API_BASE_URL}/prepare`);
+  
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
+  
+  return await response.json();
+};
+
 /**
  * API service for movie recommendations
  */
 const api = {
-  /**
-   * Get a list of movies with pagination and search
-   */
-  async fetchMovies(page = 1, limit = 20, search = ''): Promise<MoviesResponse> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
-    });
-    
-    if (search) {
-      params.append('search', search);
-    }
-    
-    const response = await fetch(`${API_BASE_URL}/movies?${params}`);
-    
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
-    }
-    
-    return await response.json();
-  },
-  
-  /**
-   * Get recommendations for a movie
-   */
-  async getRecommendations(
-    movieId: number,
-    method: 'content' | 'collaborative' | 'hybrid' = 'hybrid',
-    count = 5
-  ): Promise<RecommendationsResponse> {
-    const params = new URLSearchParams({
-      movie_id: movieId.toString(),
-      count: count.toString(),
-      method,
-    });
-    
-    const response = await fetch(`${API_BASE_URL}/recommend?${params}`);
-    
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
-    }
-    
-    return await response.json();
-  },
-  
-  /**
-   * Get dataset statistics
-   */
-  async getStats(): Promise<StatsResponse> {
-    const response = await fetch(`${API_BASE_URL}/stats`);
-    
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
-    }
-    
-    return await response.json();
-  },
-  
-  /**
-   * Prepare data (trigger backend data preparation)
-   */
-  async prepareData(): Promise<{ message: string }> {
-    const response = await fetch(`${API_BASE_URL}/prepare`);
-    
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
-    }
-    
-    return await response.json();
-  }
+  getMovies: fetchMovies,
+  getRecommendations: fetchRecommendations,
+  getStats: fetchStats,
+  prepareData,
 };
 
 export default api;

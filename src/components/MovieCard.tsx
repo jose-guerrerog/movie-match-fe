@@ -7,7 +7,7 @@ interface MovieCardProps {
   selected?: boolean;
 }
 
-const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick, selected = false }) => {
+export const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick, selected = false }) => {
   const handleClick = () => {
     if (onClick) {
       onClick(movie);
@@ -63,5 +63,3 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick, selected = false 
     </div>
   );
 };
-
-export default MovieCard;

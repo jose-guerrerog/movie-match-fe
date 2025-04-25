@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import MovieCard from './MovieCard';
+import { MovieCard } from './MovieCard';
 import api, { Movie } from '@/services/api';
 
 interface MovieListProps {
@@ -26,7 +26,7 @@ const MovieList: React.FC<MovieListProps> = ({
         setLoading(true);
         setError(null);
         
-        const data = await api.fetchMovies(page, 12, search);
+        const data = await api.getMovies(page, 12, search);
         setMovies(data.movies);
         setTotalPages(Math.ceil(data.total / data.limit));
       } catch (err) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api, { Movie, Recommendation } from '@/services/api';
-import RecommendationCard from './RecommendationCard';
+import { RecommendationCard } from './RecommendationCard';
 
 interface RecommendationsProps {
   movie?: Movie;
