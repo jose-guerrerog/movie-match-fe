@@ -14,7 +14,6 @@ const Recommendations: React.FC<RecommendationsProps> = ({
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [method, setMethod] = useState<'content' | 'collaborative' | 'hybrid'>('hybrid');
 
   // Load recommendations when movie changes
   useEffect(() => {
@@ -28,7 +27,8 @@ const Recommendations: React.FC<RecommendationsProps> = ({
         setLoading(true);
         setError(null);
         
-        const data = await api.getRecommendations(movie.id, method, 6);
+        // Using default method - no need to specify method parameter
+        const data = await api.getRecommendations(movie.id, 6);
         setRecommendations(data.recommendations);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -38,12 +38,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({
     };
 
     loadRecommendations();
-  }, [movie, method]);
-
-  // Handle method change
-  const handleMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setMethod(e.target.value as 'content' | 'collaborative' | 'hybrid');
-  };
+  }, [movie]);
 
   if (!movie) {
     return (
@@ -59,36 +54,6 @@ const Recommendations: React.FC<RecommendationsProps> = ({
         <h2 className="text-xl font-semibold mb-2">
           Recommendations for {movie.title}
         </h2>
-        
-        {/* Recommendation method selector */}
-        <div className="flex items-center space-x-2">
-          <label htmlFor="method" className="text-sm font-medium text-gray-700">
-            Method:
-          </label>
-          <select
-            id="method"
-            value={method}
-            onChange={handleMethodChange}
-            className="py-1 px-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="hybrid">Hybrid</option>
-            <option value="content">Content-Based</option>
-            <option value="collaborative">Collaborative</option>
-          </select>
-        </div>
-
-        {/* Method explanation */}
-        <div className="mt-2 text-sm text-gray-600">
-          {method === 'hybrid' && (
-            <p>Combining both content similarity and user rating patterns for balanced recommendations.</p>
-          )}
-          {method === 'content' && (
-            <p>Recommending movies with similar genres and themes to your selected movie.</p>
-          )}
-          {method === 'collaborative' && (
-            <p>Recommending movies based on what other users with similar tastes have enjoyed.</p>
-          )}
-        </div>
       </div>
 
       {/* Loading state */}

@@ -57,13 +57,11 @@ export const fetchMovies = async (page = 1, limit = 20, search = '') => {
 
 export const fetchRecommendations = async (
   movieId: number,
-  method: 'content' | 'collaborative' | 'hybrid' = 'hybrid',
   count = 5
 ) => {
   const params = new URLSearchParams({
     movie_id: movieId.toString(),
-    count: count.toString(),
-    method,
+    count: count.toString()
   });
   
   const response = await fetch(`${API_BASE_URL}/api/recommend?${params}`);

@@ -1,29 +1,25 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import { NextPage } from 'next';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import Head from 'next/head';
 import { RecommendationCard } from '@/components/RecommendationCard';
-import { RecommendationMethodSelector } from '@/components/RecommendationMethod';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { ErrorMessage } from '@/components/ErrorMessage';
 import { fetchRecommendations } from '@/services/api';
 import { 
   Movie, 
-  MovieRecommendation, 
-  RecommendationMethod
+  MovieRecommendation
 } from '@/types';
 
-const MovieDetail: NextPage = () => {
-  const router = useRouter();
-  const { id } = router.query;
+const MovieDetail = () => {
+  const params = useParams();
+  const id = params?.id as string;
   
   const [movie, setMovie] = useState<Movie | null>(null);
   const [recommendations, setRecommendations] = useState<MovieRecommendation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [method, setMethod] = useState<RecommendationMethod>('hybrid');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,7 +29,7 @@ const MovieDetail: NextPage = () => {
         setLoading(true);
         setError(null);
         
-        const response = await fetchRecommendations(Number(id), method);
+        const response = await fetchRecommendations(Number(id));
         setMovie(response.baseMovie);
         setRecommendations(response.recommendations);
       } catch (err) {
@@ -44,11 +40,7 @@ const MovieDetail: NextPage = () => {
     };
     
     fetchData();
-  }, [id, method]);
-
-  const handleMethodChange = (newMethod: RecommendationMethod) => {
-    setMethod(newMethod);
-  };
+  }, [id]);
 
   return (
     <>
@@ -89,9 +81,8 @@ const MovieDetail: NextPage = () => {
             
             {/* Recommendations */}
             <div className="mb-8">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                <h2 className="text-2xl font-bold mb-4 md:mb-0">Recommended Movies</h2>
-                <RecommendationMethodSelector value={method} onChange={handleMethodChange} />
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold">Recommended Movies</h2>
               </div>
               
               {recommendations.length > 0 ? (
