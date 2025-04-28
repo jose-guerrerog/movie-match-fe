@@ -19,15 +19,23 @@ const MovieList: React.FC<MovieListProps> = ({
   const [totalPages, setTotalPages] = useState(1);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  // Load movies
+  // Load movies with reduced initial count
   useEffect(() => {
     const loadMovies = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        const data = await api.getMovies(page, 12, search);
-        setMovies(data.movies);
+        // Use smaller initial page size to load faster
+        const limit = page === 1 ? 6 : 12;
+        const data = await api.getMovies(page, limit, search);
+        
+        if (page === 1) {
+          setMovies(data.movies);
+        } else {
+          setMovies(prev => [...prev, ...data.movies]);
+        }
+        
         setTotalPages(Math.ceil(data.total / data.limit));
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -57,12 +65,12 @@ const MovieList: React.FC<MovieListProps> = ({
     setSearchTimeout(timeout);
   };
 
-  // Handle pagination
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setPage(newPage);
-    }
-  };
+  // Simplified loading indicator
+  const LoadingIndicator = () => (
+    <div className="flex justify-center my-4">
+      <div className="w-8 h-8 border-t-2 border-blue-500 rounded-full animate-spin"></div>
+    </div>
+  );
 
   return (
     <div>
@@ -83,13 +91,6 @@ const MovieList: React.FC<MovieListProps> = ({
         </div>
       </div>
 
-      {/* Loading state */}
-      {loading && (
-        <div className="flex justify-center items-center h-48">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      )}
-
       {/* Error state */}
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
@@ -100,13 +101,13 @@ const MovieList: React.FC<MovieListProps> = ({
 
       {/* Empty state */}
       {!loading && !error && movies.length === 0 && (
-        <div className="text-center py-12">
+        <div className="text-center py-8">
           <p className="text-gray-500">No movies found. Try adjusting your search.</p>
         </div>
       )}
 
-      {/* Movie grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {/* Movie grid with simplified layout */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {movies.map((movie) => (
           <MovieCard
             key={movie.id}
@@ -117,30 +118,21 @@ const MovieList: React.FC<MovieListProps> = ({
         ))}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center mt-8">
-          <button
-            className="px-4 py-2 text-sm font-medium text-blue-500 disabled:text-gray-400"
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page === 1}
-          >
-            Previous
-          </button>
-          
-          <span className="mx-4">
-            Page {page} of {totalPages}
-          </span>
-          
-          <button
-            className="px-4 py-2 text-sm font-medium text-blue-500 disabled:text-gray-400"
-            onClick={() => handlePageChange(page + 1)}
-            disabled={page === totalPages}
-          >
-            Next
-          </button>
-        </div>
+      {/* Initial loading state */}
+      {loading && page === 1 && <LoadingIndicator />}
+
+      {/* Load more button instead of pagination */}
+      {!loading && page < totalPages && (
+        <button
+          className="w-full mt-6 py-2 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 transition-colors"
+          onClick={() => setPage(page + 1)}
+        >
+          Load More Movies
+        </button>
       )}
+
+      {/* Loading indicator for "load more" */}
+      {loading && page > 1 && <LoadingIndicator />}
     </div>
   );
 };

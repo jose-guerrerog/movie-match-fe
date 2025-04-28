@@ -36,7 +36,7 @@ export interface StatsResponse {
   uniqueGenres: number;
 }
 
-export const fetchMovies = async (page = 1, limit = 20, search = '') => {
+export const fetchMovies = async (page = 1, limit = 6, search = '') => {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
