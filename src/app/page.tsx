@@ -1,9 +1,41 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import MovieList from '@/components/MovieList';
-import Recommendations from '@/components/Recommendations';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import api, { Movie, Recommendation, StatsResponse } from '@/services/api';
+
+// Lazy load components
+const MovieList = lazy(() => import('@/components/MovieList'));
+const Recommendations = lazy(() => import('@/components/Recommendations'));
+
+// Skeleton loaders
+const StatsSkeleton = () => (
+  <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 animate-pulse">
+    {[...Array(4)].map((_, i) => (
+      <div key={i} className="bg-white rounded-lg shadow p-4 text-center">
+        <div className="h-8 bg-gray-200 rounded-full w-16 mx-auto mb-2"></div>
+        <div className="h-4 bg-gray-200 rounded w-20 mx-auto"></div>
+      </div>
+    ))}
+  </div>
+);
+
+const MovieListSkeleton = () => (
+  <div className="animate-pulse">
+    <div className="h-8 bg-gray-200 rounded w-40 mb-4"></div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="bg-white rounded-lg p-4 h-32"></div>
+      ))}
+    </div>
+  </div>
+);
+
+const RecommendationsSkeleton = () => (
+  <div className="animate-pulse">
+    <div className="h-8 bg-gray-200 rounded w-40 mb-4"></div>
+    <div className="bg-white rounded-lg p-4 h-48"></div>
+  </div>
+);
 
 export default function Home() {
   const [selectedMovie, setSelectedMovie] = useState<Movie | undefined>(undefined);
@@ -52,8 +84,10 @@ export default function Home() {
           Find your next favorite movie with our intelligent recommendation system
         </p>
         
-        {/* Dataset stats */}
-        {!statsLoading && stats && (
+        {/* Dataset stats with Suspense fallback */}
+        {statsLoading ? (
+          <StatsSkeleton />
+        ) : stats && (
           <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white rounded-lg shadow p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalMovies.toLocaleString()}</div>
@@ -76,22 +110,26 @@ export default function Home() {
       </header>
 
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Movies list */}
+        {/* Movies list with Suspense */}
         <div className="md:w-1/2">
           <h2 className="text-xl font-semibold mb-4">Browse Movies</h2>
-          <MovieList 
-            onSelectMovie={handleSelectMovie} 
-            selectedMovieId={selectedMovie?.id}
-          />
+          <Suspense fallback={<MovieListSkeleton />}>
+            <MovieList 
+              onSelectMovie={handleSelectMovie} 
+              selectedMovieId={selectedMovie?.id}
+            />
+          </Suspense>
         </div>
         
-        {/* Recommendations */}
+        {/* Recommendations with Suspense */}
         <div id="recommendations" className="md:w-1/2">
           <h2 className="text-xl font-semibold mb-4">Recommendations</h2>
-          <Recommendations
-            movie={selectedMovie}
-            onSelectRecommendation={handleSelectRecommendation}
-          />
+          <Suspense fallback={<RecommendationsSkeleton />}>
+            <Recommendations
+              movie={selectedMovie}
+              onSelectRecommendation={handleSelectRecommendation}
+            />
+          </Suspense>
         </div>
       </div>
       
