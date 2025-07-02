@@ -46,7 +46,7 @@ export const fetchMovies = async (page = 1, limit = 6, search = '') => {
     params.append('search', search);
   }
   
-  const response = await fetch(`${API_BASE_URL}/api/movies?${params}`);
+  const response = await fetch(`${API_BASE_URL}/api/v1/movies?${params}`);
   
   if (!response.ok) {
     throw new Error(`API error: ${response.status} ${response.statusText}`);
@@ -64,7 +64,7 @@ export const fetchRecommendations = async (
     count: count.toString()
   });
   
-  const response = await fetch(`${API_BASE_URL}/api/recommend?${params}`);
+  const response = await fetch(`${API_BASE_URL}/api/v1/recommend?${params}`);
   
   if (!response.ok) {
     throw new Error(`API error: ${response.status} ${response.statusText}`);
@@ -74,7 +74,7 @@ export const fetchRecommendations = async (
 };
 
 export const fetchStats = async() => {
-  const response = await fetch(`${API_BASE_URL}/api/stats`);
+  const response = await fetch(`${API_BASE_URL}/api/v1/stats`);
   
   if (!response.ok) {
     throw new Error(`API error: ${response.status} ${response.statusText}`);
@@ -84,7 +84,7 @@ export const fetchStats = async() => {
 };
 
 export const prepareData = async (message: string) => {
-  const response = await fetch(`${API_BASE_URL}/api/prepare`);
+  const response = await fetch(`${API_BASE_URL}/api/v1/prepare`);
   
   if (!response.ok) {
     throw new Error(`API error: ${response.status} ${response.statusText}`);
